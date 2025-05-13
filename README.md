@@ -100,6 +100,10 @@ The portfolio is fully responsive and optimized for:
 - **Animations**: Implemented using Framer Motion
 - **Styling**: Utility-first CSS with Tailwind
 
+  ## 📄 License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
+
 ## 👤 Model's Contact:
 
 - **Name**: Gargi
