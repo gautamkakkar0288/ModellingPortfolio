@@ -1,0 +1,8 @@
+uploads = []
+generated = []
+
+[[outputs]]
+id = "jc7-q9FTa30gVzyr0YIrw"
+uri = "file://PROJECT_OVERVIEW.md"
+type = "text"
+title = "Gargi Portfolio — Full Project Reference"

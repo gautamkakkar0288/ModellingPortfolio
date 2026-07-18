@@ -1,0 +1,32 @@
+We are resetting the structure of the website to build it perfectly from scratch. Please follow these exact layout rules:
+
+Preserve the Hero Section: Keep my existing <Hero/> component exactly as it is at the very top of the page. Do not modify its text, video background, navbar logic, or animations.
+
+Wipe and Replace Everything Below Hero: Remove all other sections from the layout. In their place, we are creating a single, continuous, cinematic scrollytelling experience that flows naturally into the rest of her portfolio.
+
+Step 1: The 3D Scroll Engine (The Canvas Scrubber):
+Immediately below the Hero, create a 300vh section with a sticky 100vh child containing an HTML5 <canvas>. Preload the WebP image sequence from the /public/frames/ folder. As the user scrolls, scrub through the frames to create the smooth 3D spinning illusion.
+
+Step 2: Cinematic Text Overlays:
+On top of this canvas, fade the model's key information in and out using GSAP ScrollTrigger based on the scroll progress:
+
+Fade in/out: Height: 5'5" | Bust: 36 | Waist: 29" | Hips: 34"
+
+Fade in/out: Shoes: US 7 | Dress: US 4 | Hair: Black | Eyes: Black
+
+Fade in/out: "Modeling is a canvas where confidence, creativity, and self-expression come to life."
+
+Step 3: The Seamless Photo Gallery:
+As the user finishes scrolling past the 3D canvas section, the page should seamlessly transition into a premium grid layout featuring her other portfolio images (gallery1.png to gallery9.png). Use the traditional garden shoot image (gallery.mp4 or its high-quality stills) as a central feature here. Make the images open in a smooth lightbox when clicked.
+
+Step 4: The Past Work Timeline & Contact:
+Below the gallery, add the minimalist "Past Work Timeline" using the entries:
+
+2025 — Pretrators (Street Modelling)
+
+2025 — Upgradables (Fashion Shoot)
+
+2024 — Recnstrct (Fashion Work)
+End the entire website with a clean, high-end, full-screen Contact block displaying her email (gaarrgiii@gmail.com) and social links.
+
+Global Smooth Scroll: Ensure lenis is wrapped around this entire new clean structure so the transition from the Hero, through the 3D spin, and down into the gallery feels completely fluid
