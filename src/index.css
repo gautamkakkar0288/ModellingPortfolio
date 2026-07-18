@@ -2,30 +2,39 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Lenis handles smooth scrolling — disable the native override */
 html {
-  scroll-behavior: smooth;
+  scroll-behavior: auto;
 }
 
-.glass {
-  background: rgba(30, 30, 30, 0.5);
-  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.18);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  border-radius: 16px;
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  transition: background 0.3s, color 0.3s;
-  color: #fff;
+/* Global cinematic base */
+html,
+body {
+  background-color: #000000;
+  color: #ffffff;
+  margin: 0;
+  padding: 0;
+  overscroll-behavior: none;
 }
 
-body, .bg-black, .bg-black\/90, .bg-black\/95, .bg-gradient-to-b, .bg-gradient-to-br {
-  transition: background 0.3s, color 0.3s;
+/* Lenis root styles */
+html.lenis,
+html.lenis body {
+  height: auto;
 }
 
-::-webkit-scrollbar {
-  width: 8px;
-  background: #222;
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
 }
-::-webkit-scrollbar-thumb {
-  background: #444;
-  border-radius: 8px;
-} 
+
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+.lenis.lenis-smooth iframe {
+  pointer-events: none;
+}

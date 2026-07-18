@@ -4,6 +4,12 @@ import react from '@vitejs/plugin-react';
 export default defineConfig({
   plugins: [react()],
 
+  server: {
+    host: '0.0.0.0',
+    port: 5000,
+    allowedHosts: true,
+  },
+
   build: {
     // Minify JS with esbuild (default, fastest) — set to 'terser' for
     // maximum compression if you add terser as a dev dependency.
@@ -35,8 +41,9 @@ export default defineConfig({
             return 'vendor-react';
           }
 
-          // GSAP + all GSAP plugins/utilities
-          if (id.includes('node_modules/gsap/')) {
+          // GSAP core + React bindings + all plugins/utilities
+          if (id.includes('node_modules/gsap/') ||
+              id.includes('node_modules/@gsap/')) {
             return 'vendor-gsap';
           }
 

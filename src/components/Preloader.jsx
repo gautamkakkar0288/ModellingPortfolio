@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import gsap from 'gsap';
 
-const TOTAL_FRAMES = 90;
+const TOTAL_FRAMES = 107;
 const FRAME_PATH   = (i) => `/frames/frame_${String(i).padStart(4, '0')}.webp`;
 const TOTAL_ASSETS = TOTAL_FRAMES + 1; // frames + hero video
 

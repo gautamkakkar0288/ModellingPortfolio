@@ -1,12 +1,21 @@
 import { motion } from 'framer-motion';
 import { useEffect, useState } from 'react';
 import useParallax from './useParallax';
+import { lenisRef } from '../lenisInstance';
 // import Particles from './Particles';
 
 const words = ['Gargi'];
 
 const navLinks = [
-  { label: 'ABOUT', href: '#about', section: 'about' },
+  {
+    label: 'ABOUT',
+    href: '#about',
+    section: 'about',
+    onClick: (e) => {
+      e.preventDefault();
+      lenisRef.current?.scrollTo('#about', { offset: 0, duration: 1.4 });
+    },
+  },
   { label: 'GALLERY', href: '#gallery', section: 'gallery' },
   { label: 'CONTACT', href: '#contact', section: 'contact' },
   { label: 'HOME', href: '#', section: 'home', onClick: () => { window.scrollTo({ top: 0, behavior: 'smooth' }); setTimeout(() => window.location.reload(), 400); } },

@@ -1,181 +1,162 @@
-import { useEffect, useRef } from 'react';
+import { useRef } from 'react';
 import { useGSAP } from '@gsap/react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 gsap.registerPlugin(ScrollTrigger);
 
-const TOTAL_FRAMES = 90;
-const FRAME_PATH   = (i) => `/frames/frame_${String(i).padStart(4, '0')}.webp`;
+const FRAME_COUNT = 107;
 
-// ── Data ──────────────────────────────────────────────────────────────────────
-const leftStats = [
+function getFramePath(index) {
+  return `/frames/frame_${String(index + 1).padStart(4, '0')}.webp`;
+}
+
+// Stat data — left and right columns, top to bottom
+const LEFT_STATS = [
   { label: 'Hair',   value: 'Black' },
-  { label: 'Height', value: "5′5″"  },
+  { label: 'Height', value: "5'5\u2033" },
   { label: 'Bust',   value: '36'    },
-  { label: 'Waist',  value: '29″'   },
+  { label: 'Waist',  value: '29\u2033' },
 ];
-const rightStats = [
+
+const RIGHT_STATS = [
   { label: 'Eyes',  value: 'Black' },
   { label: 'Shoes', value: 'US 7'  },
   { label: 'Dress', value: 'US 4'  },
-  { label: 'Hips',  value: '34″'   },
+  { label: 'Hips',  value: '34\u2033' },
 ];
 
 export default function SequenceScrubber() {
-  const sectionRef    = useRef(null);
-  const canvasRef     = useRef(null);
-  const framesRef     = useRef([]);
-  const frameIndexRef = useRef(0);
+  const sectionRef   = useRef(null);
+  const canvasRef    = useRef(null);
+  const images       = useRef([]);
+  const currentFrame = useRef(0);
 
-  // 4 refs per column
-  const lRefs = [useRef(null), useRef(null), useRef(null), useRef(null)];
-  const rRefs = [useRef(null), useRef(null), useRef(null), useRef(null)];
+  // One ref array per column — indexed 0–3 top to bottom
+  const leftRefs  = useRef([]);
+  const rightRefs = useRef([]);
 
-  // ── Preload ────────────────────────────────────────────────────────────────
-  useEffect(() => {
-    // Pre-allocate slots so index lookups are always valid
-    const images = new Array(TOTAL_FRAMES).fill(null);
-    framesRef.current = images;
-
-    // Load frame 1 first so the canvas shows immediately
-    const first = new Image();
-    first.onload = () => drawFrame(0);
-    first.src = FRAME_PATH(1);
-    images[0] = first;
-
-    // Load the rest in the background, one at a time, to avoid
-    // saturating the browser's connection pool
-    let idx = 2;
-    function loadNext() {
-      if (idx > TOTAL_FRAMES) return;
-      const img = new Image();
-      img.onload = loadNext;
-      img.onerror = loadNext;
-      img.src = FRAME_PATH(idx);
-      images[idx - 1] = img;
-      idx++;
-    }
-    // Kick off a small number of parallel loaders for a good
-    // speed / connection balance (4 concurrent streams)
-    for (let lane = 0; lane < 4; lane++) loadNext();
-  }, []);
-
-  // ── Draw ───────────────────────────────────────────────────────────────────
   function drawFrame(index) {
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
-    const img = framesRef.current[index];
-    if (!img || !img.complete || img.naturalWidth === 0) return;
-
-    canvas.width  = window.innerWidth;
-    canvas.height = window.innerHeight;
-
+    const img = images.current[index];
+    if (!img || !img.complete) return;
     ctx.imageSmoothingEnabled = true;
     ctx.imageSmoothingQuality = 'high';
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    // object-fit: contain at 100% screen height, centred
-    const maxH   = canvas.height * 1.0;
-    const maxW   = canvas.width;
-    const aspect = img.naturalWidth / img.naturalHeight;
-    let drawW    = maxH * aspect;
-    let drawH    = maxH;
-    if (drawW > maxW) { drawW = maxW; drawH = maxW / aspect; }
-    const offsetX = (canvas.width  - drawW) / 2;
-    const offsetY = (canvas.height - drawH) / 2;
-    ctx.drawImage(img, offsetX, offsetY, drawW, drawH);
+    // Scale image so it fills 98% of the canvas height, centred horizontally
+    const scale = (canvas.height * 0.98) / img.naturalHeight;
+    const dw = img.naturalWidth  * scale;
+    const dh = img.naturalHeight * scale;
+    const dx = (canvas.width  - dw) / 2;
+    const dy = (canvas.height - dh) / 2;
+    ctx.drawImage(img, dx, dy, dw, dh);
   }
 
-  // ── GSAP ──────────────────────────────────────────────────────────────────
   useGSAP(() => {
-    // Frame scrubbing
-    gsap.to({}, {
-      ease: 'none',
-      scrollTrigger: {
-        trigger: sectionRef.current,
-        start: 'top top',
-        end: 'bottom bottom',
-        scrub: 0.5,
-        onUpdate: (self) => {
-          const index = Math.round(self.progress * (TOTAL_FRAMES - 1));
-          if (index !== frameIndexRef.current) {
-            frameIndexRef.current = index;
-            drawFrame(index);
-          }
-        },
+    // ── Canvas sizing ────────────────────────────────────────────
+    function resize() {
+      const canvas = canvasRef.current;
+      if (!canvas) return;
+      canvas.width  = window.innerWidth;
+      canvas.height = window.innerHeight;
+      drawFrame(currentFrame.current);
+    }
+    resize();
+    window.addEventListener('resize', resize);
+
+    // ── Preload all frames ───────────────────────────────────────
+    for (let i = 0; i < FRAME_COUNT; i++) {
+      const img = new Image();
+      img.src = getFramePath(i);
+      if (i === 0) img.onload = () => drawFrame(0);
+      images.current[i] = img;
+    }
+
+    // ── Sequence scrub ───────────────────────────────────────────
+    ScrollTrigger.create({
+      trigger: sectionRef.current,
+      start: 'top top',
+      end: 'bottom bottom',
+      scrub: true,
+      onUpdate(self) {
+        const index = Math.min(FRAME_COUNT - 1, Math.floor(self.progress * FRAME_COUNT));
+        if (index !== currentFrame.current) {
+          currentFrame.current = index;
+          drawFrame(index);
+        }
       },
     });
 
-    // ── Stat items: interleaved order L0 R0 L1 R1 L2 R2 L3 R3 ─────────────
-    // Ordered array so sequential position() calls interleave the columns
-    const orderedRefs = [
-      lRefs[0], rRefs[0],
-      lRefs[1], rRefs[1],
-      lRefs[2], rRefs[2],
-      lRefs[3], rRefs[3],
+    // ── Stat overlay animation ───────────────────────────────────
+    // Interleaved order: L[0], R[0], L[1], R[1], L[2], R[2], L[3], R[3]
+    const ordered = [
+      leftRefs.current[0],  rightRefs.current[0],
+      leftRefs.current[1],  rightRefs.current[1],
+      leftRefs.current[2],  rightRefs.current[2],
+      leftRefs.current[3],  rightRefs.current[3],
     ];
 
-    // Set initial hidden state
-    gsap.set(orderedRefs.map((r) => r.current), { opacity: 0, y: 40 });
+    // All start hidden, 40px below final position
+    gsap.set(ordered, { opacity: 0, y: 40 });
 
-    // Build one scrubbed timeline — each item staggers 0.12 timeline units apart
-    const STEP = 0.12;
+    // One timeline scrubbed to the 300vh section.
+    // 8 items animate in sequentially — each staggered 0.9 units apart.
+    // Total animate-in window: 0 → ~7.2 units (0–72% scroll).
+    // A hold tween pushes the timeline to 10 units so items stay
+    // fully visible from ~72% all the way to 100% scroll progress.
     const tl = gsap.timeline({
       scrollTrigger: {
         trigger: sectionRef.current,
         start: 'top top',
         end: 'bottom bottom',
-        scrub: 1.5,
+        scrub: 1.5,          // slight lag = smoother feel on fast scroll
       },
     });
 
-    orderedRefs.forEach((ref, i) => {
+    ordered.forEach((el, i) => {
       tl.to(
-        ref.current,
-        { opacity: 1, y: 0, duration: 0.4, ease: 'power3.out' },
-        i * STEP        // stagger position within the timeline
+        el,
+        { opacity: 1, y: 0, duration: 1, ease: 'power3.out' },
+        i * 0.9,             // stagger start position
       );
     });
+
+    // Extend timeline so all items hold until the section ends
+    tl.to({}, { duration: 2.8 });
+
+    return () => window.removeEventListener('resize', resize);
   }, { scope: sectionRef });
 
-  // Redraw on resize
-  useEffect(() => {
-    const onResize = () => drawFrame(frameIndexRef.current);
-    window.addEventListener('resize', onResize);
-    return () => window.removeEventListener('resize', onResize);
-  }, []);
-
   return (
-    <section ref={sectionRef} className="h-[300vh] bg-black relative">
+    <section id="about" ref={sectionRef} className="h-[300vh] bg-black relative">
       <div className="sticky top-0 h-screen w-full overflow-hidden">
 
-        {/* Spotlight — deepest layer */}
+        {/* ── Radial spotlight (behind everything) ── */}
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.08)_0%,transparent_60%)] pointer-events-none z-0" />
 
-        {/* Watermark — behind model, in front of spotlight */}
+        {/* ── GARGI watermark ── */}
         <div className="absolute inset-0 flex items-center justify-center text-[15vw] font-black text-white opacity-[0.03] tracking-widest pointer-events-none z-0 select-none">
           GARGI
         </div>
 
-        {/* Canvas — above background layers */}
-        <canvas ref={canvasRef} className="absolute inset-0 w-full h-full z-10" />
+        {/* ── Canvas (above background layers, below stats) ── */}
+        <canvas ref={canvasRef} className="absolute inset-0 z-10" />
 
-        {/* Vignette */}
-        <div
-          className="absolute inset-0 pointer-events-none"
-          style={{ background: 'radial-gradient(ellipse at center, transparent 45%, rgba(0,0,0,0.55) 100%)' }}
-        />
-
-        {/* ── Text overlay ─────────────────────────────────────────────────── */}
+        {/* ── Stats overlay ── */}
         <div className="absolute inset-0 z-20 w-full h-full max-w-7xl mx-auto px-4 md:px-12 py-32 flex justify-between pointer-events-none">
 
-          {/* LEFT column */}
+          {/* Left column */}
           <div className="flex flex-col justify-around h-full">
-            {leftStats.map((stat, i) => (
-              <div key={stat.label} ref={lRefs[i]} className="stat-item">
-                <p className="text-sm tracking-[0.2em] text-gray-400 mb-1 uppercase font-light">
+            {LEFT_STATS.map((stat, i) => (
+              <div
+                key={stat.label}
+                className="stat-item"
+                ref={(el) => { leftRefs.current[i] = el; }}
+              >
+                <p className="text-sm tracking-[0.2em] text-gray-400 mb-1 uppercase">
                   {stat.label}
                 </p>
                 <p className="text-3xl md:text-4xl font-light text-white drop-shadow-lg">
@@ -185,11 +166,15 @@ export default function SequenceScrubber() {
             ))}
           </div>
 
-          {/* RIGHT column */}
-          <div className="flex flex-col justify-around h-full items-end text-right">
-            {rightStats.map((stat, i) => (
-              <div key={stat.label} ref={rRefs[i]} className="stat-item">
-                <p className="text-sm tracking-[0.2em] text-gray-400 mb-1 uppercase font-light">
+          {/* Right column */}
+          <div className="flex flex-col justify-around h-full items-end">
+            {RIGHT_STATS.map((stat, i) => (
+              <div
+                key={stat.label}
+                className="stat-item text-right"
+                ref={(el) => { rightRefs.current[i] = el; }}
+              >
+                <p className="text-sm tracking-[0.2em] text-gray-400 mb-1 uppercase">
                   {stat.label}
                 </p>
                 <p className="text-3xl md:text-4xl font-light text-white drop-shadow-lg">
@@ -200,8 +185,6 @@ export default function SequenceScrubber() {
           </div>
 
         </div>
-        {/* ── /Text overlay ────────────────────────────────────────────────── */}
-
       </div>
     </section>
   );
