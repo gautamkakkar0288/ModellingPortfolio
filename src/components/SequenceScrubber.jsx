@@ -34,14 +34,31 @@ export default function SequenceScrubber() {
 
   // ── Preload ────────────────────────────────────────────────────────────────
   useEffect(() => {
-    const images = [];
-    for (let i = 1; i <= TOTAL_FRAMES; i++) {
-      const img = new Image();
-      img.src = FRAME_PATH(i);
-      img.onload = () => { if (i === 1) drawFrame(0); };
-      images.push(img);
-    }
+    // Pre-allocate slots so index lookups are always valid
+    const images = new Array(TOTAL_FRAMES).fill(null);
     framesRef.current = images;
+
+    // Load frame 1 first so the canvas shows immediately
+    const first = new Image();
+    first.onload = () => drawFrame(0);
+    first.src = FRAME_PATH(1);
+    images[0] = first;
+
+    // Load the rest in the background, one at a time, to avoid
+    // saturating the browser's connection pool
+    let idx = 2;
+    function loadNext() {
+      if (idx > TOTAL_FRAMES) return;
+      const img = new Image();
+      img.onload = loadNext;
+      img.onerror = loadNext;
+      img.src = FRAME_PATH(idx);
+      images[idx - 1] = img;
+      idx++;
+    }
+    // Kick off a small number of parallel loaders for a good
+    // speed / connection balance (4 concurrent streams)
+    for (let lane = 0; lane < 4; lane++) loadNext();
   }, []);
 
   // ── Draw ───────────────────────────────────────────────────────────────────
