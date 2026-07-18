@@ -2,13 +2,7 @@
 
 A modern, responsive, and interactive portfolio website for fashion model Gargi. Built with React and modern web technologies, this portfolio showcases her work, measurements, and professional journey in an elegant and engaging way.
 
-**Preview:**
-![Screenshot 2025-05-13 232211](https://github.com/user-attachments/assets/57fde022-5878-4648-903a-f7e721ab048f)
-![Screenshot 2025-05-13 232234](https://github.com/user-attachments/assets/cdff430f-778e-440a-8fd1-fd25038604b2)
-![Screenshot 2025-05-13 232244](https://github.com/user-attachments/assets/05afc7ae-0a61-4fb3-8bbd-bfe0d2f570db)
-
-
-
+![Portfolio Preview](public/gallery8.png)
 
 ## 🌟 Features
 
@@ -53,7 +47,7 @@ A modern, responsive, and interactive portfolio website for fashion model Gargi.
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/gautamkakkar0288/ModellingPortfolio.git
+   git clone [your-repository-url]
    cd portfolio
    ```
 
@@ -100,23 +94,16 @@ The portfolio is fully responsive and optimized for:
 - **Animations**: Implemented using Framer Motion
 - **Styling**: Utility-first CSS with Tailwind
 
-  ## 📄 License
+## 📄 License
 
 This project is licensed under the MIT License - see the LICENSE file for details.
 
-## 👤 Model's Contact:
+## 👤 Contact
 
 - **Name**: Gargi
 - **Email**: gaarrgiii@gmail.com
 - **Phone**: +91 70567-09119
 - **Instagram**: [@gxrgii](https://www.instagram.com/gxrgii/)
-
-## 👤 Designed By:
-
-- **Name**: Gautam Kakkar
-- **Email**: gautamarora0288@gmail.com
-- **Phone**: +91 9115735836
-- **Instagram**: [@gautamarora0288](https://www.instagram.com/gautamarora0288/)
 
 ## 🙏 Acknowledgments
 
