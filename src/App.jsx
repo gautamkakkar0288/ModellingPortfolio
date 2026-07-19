@@ -9,6 +9,7 @@ import SequenceScrubber from './components/SequenceScrubber';
 import PremiumGallery from './components/PremiumGallery';
 import CinematicTimeline from './components/CinematicTimeline';
 import CinematicContact from './components/CinematicContact';
+import Footer from './components/Footer';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -61,6 +62,9 @@ export default function App() {
 
       {/* 5. Full-screen contact */}
       <CinematicContact />
+
+      {/* 6. Footer */}
+      <Footer />
     </div>
   );
 }

@@ -22,8 +22,12 @@ export default function Particles({ className = '', style = {}, count = 40 }) {
       mouse.x = e.clientX;
       mouse.y = e.clientY;
     }
+    function onMouseLeave() {
+      mouse.x = -1000;
+      mouse.y = -1000;
+    }
     window.addEventListener('mousemove', onMouseMove);
-    window.addEventListener('mouseleave', () => { mouse.x = -1000; mouse.y = -1000; });
+    window.addEventListener('mouseleave', onMouseLeave);
 
     let particles = [];
     function createParticles() {
@@ -101,7 +105,7 @@ export default function Particles({ className = '', style = {}, count = 40 }) {
     return () => {
       window.removeEventListener('resize', resize);
       window.removeEventListener('mousemove', onMouseMove);
-      window.removeEventListener('mouseleave', () => { mouse.x = -1000; mouse.y = -1000; });
+      window.removeEventListener('mouseleave', onMouseLeave);
       cancelAnimationFrame(animationId);
     };
   }, [count]);

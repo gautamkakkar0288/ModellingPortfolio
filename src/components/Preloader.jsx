@@ -4,6 +4,7 @@ import gsap from 'gsap';
 const TOTAL_FRAMES = 107;
 const FRAME_PATH   = (i) => `/frames/frame_${String(i).padStart(4, '0')}.webp`;
 const TOTAL_ASSETS = TOTAL_FRAMES + 1; // frames + hero video
+const PRELOAD_TIMEOUT = 6000; // Force complete after 6 seconds
 
 export default function Preloader({ onComplete }) {
   const preloaderRef = useRef(null);
@@ -13,9 +14,11 @@ export default function Preloader({ onComplete }) {
 
   const [progress, setProgress]   = useState(0);
   const loadedCount                = useRef(0);
+  const hasCompletedRef            = useRef(false);
 
   // ── Tick progress ──────────────────────────────────────────────────────────
   function tick() {
+    if (hasCompletedRef.current) return;
     loadedCount.current += 1;
     const pct = Math.round((loadedCount.current / TOTAL_ASSETS) * 100);
     setProgress(pct);
@@ -23,6 +26,9 @@ export default function Preloader({ onComplete }) {
 
   // ── Reveal animation ───────────────────────────────────────────────────────
   function runReveal() {
+    if (hasCompletedRef.current) return;
+    hasCompletedRef.current = true;
+
     const tl = gsap.timeline();
 
     // 1. Fade out bar + counter
@@ -84,9 +90,17 @@ export default function Preloader({ onComplete }) {
     }
     for (let lane = 0; lane < 4; lane++) loadNext();
 
+    // Failsafe: if assets take too long, force completion
+    const failsafeTimeout = setTimeout(() => {
+      if (!hasCompletedRef.current) {
+        setProgress(100);
+      }
+    }, PRELOAD_TIMEOUT);
+
     return () => {
       document.body.style.overflow = '';
       clearTimeout(videoTimeout);
+      clearTimeout(failsafeTimeout);
     };
   }, []);
 
@@ -94,6 +108,11 @@ export default function Preloader({ onComplete }) {
   useEffect(() => {
     if (barFillRef.current) barFillRef.current.style.width = `${progress}%`;
     if (counterRef.current) counterRef.current.textContent  = `${progress}%`;
+    
+    // When progress reaches 100%, trigger the reveal animation
+    if (progress >= 100) {
+      runReveal();
+    }
   }, [progress]);
 
   return (
