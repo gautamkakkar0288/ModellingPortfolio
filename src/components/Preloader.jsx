@@ -108,6 +108,11 @@ export default function Preloader({ onComplete }) {
   useEffect(() => {
     if (barFillRef.current) barFillRef.current.style.width = `${progress}%`;
     if (counterRef.current) counterRef.current.textContent  = `${progress}%`;
+    
+    // When progress reaches 100%, trigger the reveal animation
+    if (progress >= 100) {
+      runReveal();
+    }
   }, [progress]);
 
   return (
