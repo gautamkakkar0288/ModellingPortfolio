@@ -4,6 +4,7 @@ import gsap from 'gsap';
 const TOTAL_FRAMES = 107;
 const FRAME_PATH   = (i) => `/frames/frame_${String(i).padStart(4, '0')}.webp`;
 const TOTAL_ASSETS = TOTAL_FRAMES + 1; // frames + hero video
+const PRELOAD_TIMEOUT = 6000; // Force complete after 6 seconds
 
 export default function Preloader({ onComplete }) {
   const preloaderRef = useRef(null);
@@ -13,17 +14,21 @@ export default function Preloader({ onComplete }) {
 
   const [progress, setProgress]   = useState(0);
   const loadedCount                = useRef(0);
+  const hasCompletedRef            = useRef(false);
 
   // ── Tick progress ──────────────────────────────────────────────────────────
   function tick() {
+    if (hasCompletedRef.current) return;
     loadedCount.current += 1;
     const pct = Math.round((loadedCount.current / TOTAL_ASSETS) * 100);
-    console.log(`[Preloader] Asset loaded: ${loadedCount.current}/${TOTAL_ASSETS} (${pct}%)`);
     setProgress(pct);
   }
 
   // ── Reveal animation ───────────────────────────────────────────────────────
   function runReveal() {
+    if (hasCompletedRef.current) return;
+    hasCompletedRef.current = true;
+
     const tl = gsap.timeline();
 
     // 1. Fade out bar + counter
@@ -85,13 +90,12 @@ export default function Preloader({ onComplete }) {
     }
     for (let lane = 0; lane < 4; lane++) loadNext();
 
-    // Failsafe: if assets take too long, force completion after 8s
+    // Failsafe: if assets take too long, force completion
     const failsafeTimeout = setTimeout(() => {
-      const remaining = TOTAL_ASSETS - loadedCount.current;
-      if (remaining > 0) {
-        for (let i = 0; i < remaining; i++) tick();
+      if (!hasCompletedRef.current) {
+        setProgress(100);
       }
-    }, 8000);
+    }, PRELOAD_TIMEOUT);
 
     return () => {
       document.body.style.overflow = '';
