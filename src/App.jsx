@@ -44,7 +44,7 @@ export default function App() {
   return (
     <div className="bg-black text-white">
       {/* Preloader — fixed overlay, slides up once all assets are ready */}
-      {false && !preloaderDone && (
+      {!preloaderDone && (
         <Preloader onComplete={() => setPreloaderDone(true)} />
       )}
 
