@@ -7,6 +7,9 @@
     "build": "vite build",
     "preview": "vite preview"
   },
+  "engines": {
+    "node": "22.x"
+  },
   "dependencies": {
     "@gsap/react": "^2.1.2",
     "@studio-freight/lenis": "^1.0.42",
