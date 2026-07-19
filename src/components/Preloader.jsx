@@ -84,9 +84,18 @@ export default function Preloader({ onComplete }) {
     }
     for (let lane = 0; lane < 4; lane++) loadNext();
 
+    // Failsafe: if assets take too long, force completion after 8s
+    const failsafeTimeout = setTimeout(() => {
+      const remaining = TOTAL_ASSETS - loadedCount.current;
+      if (remaining > 0) {
+        for (let i = 0; i < remaining; i++) tick();
+      }
+    }, 8000);
+
     return () => {
       document.body.style.overflow = '';
       clearTimeout(videoTimeout);
+      clearTimeout(failsafeTimeout);
     };
   }, []);
 
