@@ -13,11 +13,36 @@ const navLinks = [
     section: 'about',
     onClick: (e) => {
       e.preventDefault();
-      lenisRef.current?.scrollTo('#about', { offset: 0, duration: 1.4 });
+      const aboutEl = document.getElementById('about');
+      if (aboutEl) {
+        lenisRef.current?.scrollTo(aboutEl, { offset: 0, duration: 1.4 });
+      }
     },
   },
-  { label: 'GALLERY', href: '#gallery', section: 'gallery' },
-  { label: 'CONTACT', href: '#contact', section: 'contact' },
+  {
+    label: 'GALLERY',
+    href: '#gallery',
+    section: 'gallery',
+    onClick: (e) => {
+      e.preventDefault();
+      const galleryEl = document.getElementById('gallery');
+      if (galleryEl) {
+        lenisRef.current?.scrollTo(galleryEl, { offset: 0, duration: 1.4 });
+      }
+    },
+  },
+  {
+    label: 'CONTACT',
+    href: '#contact',
+    section: 'contact',
+    onClick: (e) => {
+      e.preventDefault();
+      const contactEl = document.getElementById('contact');
+      if (contactEl) {
+        lenisRef.current?.scrollTo(contactEl, { offset: 0, duration: 1.4 });
+      }
+    },
+  },
   { label: 'HOME', href: '#', section: 'home', onClick: () => { window.scrollTo({ top: 0, behavior: 'smooth' }); setTimeout(() => window.location.reload(), 400); } },
 ];
 
