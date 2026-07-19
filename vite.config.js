@@ -20,8 +20,8 @@ export default defineConfig({
 
     // Fine-tune esbuild minification
     esbuildOptions: {
-      // Drop console.* and debugger statements from production output
-      drop: ['console', 'debugger'],
+      // Keep console for debugging
+      // drop: ['console', 'debugger'],
     },
 
     rollupOptions: {
