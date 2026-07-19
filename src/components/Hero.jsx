@@ -21,13 +21,7 @@ const navLinks = [
   { label: 'HOME', href: '#', section: 'home', onClick: () => { window.scrollTo({ top: 0, behavior: 'smooth' }); setTimeout(() => window.location.reload(), 400); } },
 ];
 
-const sectionMap = {
-  about: 'About Me',
-  'body-measurements': 'Body Measurements',
-  gallery: 'Photo Gallery',
-  timeline: 'Past Work Timeline',
-  contact: 'Contact',
-};
+// sectionMap removed — kept in design notes but unused in runtime
 
 export default function Hero() {
   const [displayed, setDisplayed] = useState('');
