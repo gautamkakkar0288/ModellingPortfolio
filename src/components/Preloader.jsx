@@ -18,6 +18,7 @@ export default function Preloader({ onComplete }) {
   function tick() {
     loadedCount.current += 1;
     const pct = Math.round((loadedCount.current / TOTAL_ASSETS) * 100);
+    console.log(`[Preloader] Asset loaded: ${loadedCount.current}/${TOTAL_ASSETS} (${pct}%)`);
     setProgress(pct);
   }
 
